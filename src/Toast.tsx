@@ -1,51 +1,50 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 
 export interface ToastType {
-  message: string;
+  content: any;
   onClose?: () => void;
 }
 
 interface Props {
-  list: ToastType[];
-  setList: (key: ToastType[]) => any;
-  clearTime?: number;
+  message: any;
 }
 
-export const Toast: React.FC<Props> = ({ list, setList }) => {
-  const deleteOldToast = () => {
-    if (list.length === 0) return;
-    if (list.length === 1) return setList([]);
-    if (list.length > 1) {
-      const [old, ...rest] = list;
-      console.log(rest);
-      setList(rest);
-    }
+export const useToast = () => {
+  const [message, open] = useState<ToastType | null>(null);
+  return {
+    open,
+    message,
   };
+};
 
+export const Toast: React.FC<Props> = ({ message }) => {
+  const [list, setList] = useState<ToastType[] | []>([]);
   const clear = () => {
     setList([]);
   };
 
+  // append message to list
+  useEffect(() => {
+    if (message) {
+      setList((prev: ToastType[]) => [...prev, message]);
+    }
+  }, [message]);
+
+  // clear container
   useEffect(() => {
     const timeout = setTimeout(() => {
       clear();
     }, 3600);
     return () => clearTimeout(timeout);
   }, [list]);
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     deleteOldToast();
-  //   }, 3600);
-  //   return () => clearInterval(interval);
-  // }, [list]);
 
   return (
     <StyledToastContainer>
       {list.map((toast, index) => {
         return (
           <StyledTextBox key={index} onClick={() => toast.onClose?.()}>
-            {toast.message}
+            {toast.content}
           </StyledTextBox>
         );
       })}
@@ -61,7 +60,9 @@ const StyledToastContainer = styled.div`
 `;
 
 const fadeIn = keyframes`
-  100% { opacity: 1 }
+  100% { 
+    opacity: 1;
+  }
 `;
 
 const fadeOut = keyframes`
@@ -71,10 +72,18 @@ const fadeOut = keyframes`
   }
 `;
 
+const hide = keyframes`
+  100% { 
+    position: absolute;
+    bottom: -2000px;
+  }
+`;
+
 const StyledTextBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0;
   margin-top: 15px;
   width: 343px;
   height: 46px;
@@ -83,5 +92,6 @@ const StyledTextBox = styled.div`
   color: white;
   font-size: 20px;
   animation: 0.2s cubic-bezier(0.65, 0, 0.35, 1) 0.1s forwards ${fadeIn},
-    0.3s cubic-bezier(0.65, 0, 0.35, 1) 3s forwards ${fadeOut};
+    0.3s cubic-bezier(0.65, 0, 0.35, 1) 3s forwards ${fadeOut},
+    0s step-end 3.3s forwards ${hide};
 `;

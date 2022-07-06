@@ -1,22 +1,19 @@
-import { useState } from 'react';
 import Button from './Button';
-import { Toast, ToastType } from './Toast';
+import { Toast, useToast } from './Toast';
 
 function App() {
-  const [list, setList] = useState<ToastType[] | []>([]);
+  const { message, open } = useToast();
   const onClick = (message: string) => {
-    const newMessage = {
-      message,
+    open({
+      content: 'hello world!!',
       onClose: () => console.log(message),
-    };
-
-    setList((prev: ToastType[]) => [...prev, newMessage]);
+    });
   };
 
   return (
     <div className='App'>
       <Button onClick={onClick} />
-      <Toast list={list} setList={setList} />
+      <Toast message={message} />
     </div>
   );
 }
