@@ -2,18 +2,20 @@ import Button from './Button';
 import { Toast, useToast } from './Toast';
 
 function App() {
-  const { message, open } = useToast();
+  const { data, open } = useToast();
   const onClick = (message: string) => {
     open({
       content: 'hello world!!',
-      onClose: () => console.log(message),
+      onClick: () => {
+        console.log(message);
+      },
     });
   };
 
   return (
     <div className='App'>
       <Button onClick={onClick} />
-      <Toast message={message} />
+      <Toast data={data} />
     </div>
   );
 }
